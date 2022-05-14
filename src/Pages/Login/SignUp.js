@@ -1,19 +1,18 @@
 import React from 'react';
-import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init';
 import { useForm } from "react-hook-form";
 import Looding from '../Shared/Looding';
 import { Link } from 'react-router-dom';
 
-
-const Login = () => {
+const SignUp = () => {
     const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
     const [
-        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
         user,
         loading,
         error,
-    ] = useSignInWithEmailAndPassword(auth);
+      ] = useCreateUserWithEmailAndPassword(auth);
 
     const { register, formState: { errors }, handleSubmit } = useForm();
 
@@ -27,23 +26,45 @@ const Login = () => {
         signInError = <small><p className='text-red-500'>{error?.message || gError?.message}</p></small>
     }
 
-    if (gUser) {
-        console.log(gUser);
-    }
-    if (user) {
-        console.log(user);
+    if (gUser || user) {
+        console.log(gUser || user);
     }
 
     const onSubmit = data => {
         console.log(data);
-        signInWithEmailAndPassword(data.email, data.password);
+        createUserWithEmailAndPassword(data.email, data.password);
     };
     return (
         <div className='flex h-screen justify-center items-center'>
             <div className="card w-96 bg-base-100 shadow-xl">
                 <div className="card-body">
-                    <h2 className="text-center text-2xl font-bold">Login</h2>
+                    <h2 className="text-center text-2xl font-bold">Sign Up</h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        <div class="form-control w-full max-w-xs">
+                            <label class="label">
+                                <span class="label-text">What is your Name?</span>
+                            </label>
+                            <input type="text"
+                                placeholder="Your Name"
+                                class="input input-bordered w-full max-w-xs"
+                                {...register("name", {
+                                    required: {
+                                        value: true,
+                                        message: 'Name is Required'
+                                    },
+                                    minLength: {
+                                        value: 3,
+                                        message: 'Enter valid Name'
+                                    }
+                                })} />
+                            <label class="label">
+                                {errors.name?.type === 'required' && <span class="label-text-alt text-red-500">{errors.name.message}</span>}
+                                {errors.name?.type === 'minLength' && <span class="label-text-alt text-red-500">{errors.name.message}</span>}
+
+
+                            </label>
+                        </div>
+
                         <div class="form-control w-full max-w-xs">
                             <label class="label">
                                 <span class="label-text">Email</span>
@@ -68,6 +89,9 @@ const Login = () => {
 
                             </label>
                         </div>
+
+
+                        
                         <div class="form-control w-full max-w-xs">
                             <label class="label">
                                 <span class="label-text">Password</span>
@@ -87,13 +111,13 @@ const Login = () => {
                                 })} />
                             <label class="label">
                                 {errors.password?.type === 'required' && <span class="label-text-alt text-red-500">{errors.password.message}</span>}
-                                {errors.password?.type === 'pattern' && <span class="label-text-alt text-red-500">{errors.password.message}</span>}
+                                {errors.password?.type === 'minLength' && <span class="label-text-alt text-red-500">{errors.password.message}</span>}
                             </label>
                         </div>
                         {signInError}
-                        <input className='btn w-full max-w-xs text-white' type="submit" value='Login' />
+                        <input className='btn w-full max-w-xs text-white' type="submit" value='Sign Up' />
                     </form>
-                    <p><small>New in Doctors Portal? <Link to='/signup' className='text-blue-600'>Creare New Account.</Link></small> </p>
+                    <p><small>Alrady have an account? <Link to='/login' className='text-blue-600'>login hare.</Link></small> </p>
 
 
                     <div className="divider">OR</div>
@@ -110,4 +134,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default SignUp;
